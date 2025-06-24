@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Typing Game - Raj Kumar Karki</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #121212;
+      color: #f0f0f0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+
+    .head {
+     text-align: center;
+}
+
+.foot {
+  text-align: center;
+  padding: 10px;
+  color: #666;
+  font-size: 14px;
+}
+
+   .head h1 {
+      color: #00bcd4;
+      margin-top: auto;
+    }
+
+    #word {
+      font-size: 2rem;
+      margin: 30px 0;
+      text-align: center;
+    }
+
+    #input {
+      padding: 10px;
+      font-size: 1.2rem;
+      width: 100%;
+      max-width: 300px;
+      border-radius: 5px;
+      border: none;
+      outline: none;
+    }
+
+    .info {
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+      max-width: 300px;
+      margin: 10px 0;
+      font-size: 1.5rem;
+      align-items: center;
+    }
+    
+    #message {
+      margin-top: 20px;
+      font-size: 1rem;
+      color: limegreen;
+      text-align: center;
+    }
+
+    #level {
+       margin: 40px;
+      font-size: 2rem;
+      text-align: center;
+    }
+
+/* button {
+      padding: 10px 20px;
+      margin-top: 20px;
+      background: #00bcd4;
+      color: #121212;
+      font-weight: bold;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    } */
+
+    #restartBtn {
+      display: none;
+      padding: 10px 20px;
+      /*margin-top: 20px;*/
+      background: #00bcd4;
+      color: #121212;
+      font-weight: bold;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    #musicToggle {
+      margin-top: 80px;
+      margin-bottom: 40px;
+      background: #444;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      padding: 8px 16px;
+      cursor: pointer;
+      margin-inline-start: auto;
+    }
+
+    /* Mobile Responsiveness */
+ @media (max-width: 500px) {
+      #word {
+        font-size: 1.5rem;
+      }
+      #input {
+        
+        font-size: 1rem;
+      }
+      #message {
+        font-size: 1.2rem;
+      }
+    }
+  </style>
+</head>
+<body>
+      
+  <button id="musicToggle" onclick="toggleMusic()">🔊 Music: On</button>
+  <audio id="bgMusic" loop autoplay>
+    <source src="https://www.bensound.com/bensound-music/bensound-energy.mp3" type="audio/mpeg">
+    Your browser does not support the audio element.
+  </audio>
+
+  <header class="head">
+    <h1>Typing Game By Raj Kumar Karki</h1>
+  </header>
+ 
+
+  <!-- <h1>Typing Game by Raj Kumar Karki</h1> -->
+  <div class="game">
+    <div id="level">Level: Easy</div>
+  <div class="info">
+    <div id="score">Score: 0</div>
+    <div id="time">Time: 20s</div>
+  </div>
+  
+  <div id="word">Loading...</div>
+  <input type="text" id="input" placeholder="Start typing...">
+  <div id="message"></div>
+  <br><br>
+  <center><button id="restartBtn" onclick="restartGame()">Try Again</button></center>
+
+  <script>
+    const easyWords =  ["cat", "dog", "pen", "book", "sun", "map", "hat", "run", "tree", "cup","jam","pot","tag","bed","lip","net","win","rod","cub","fan"];
+    const mediumWords = ["yellow", "guitar", "planet", "office", "school", "window", "market", "rocket", "jungle", "silver"];
+    const hardWords = ["elephant", "volcano", "mysterious", "adventure", "champion", "laboratory", "revolution", "philosophy", "architecture", "encyclopedia"];
+
+    const wordEl = document.getElementById("word");
+    const inputEl = document.getElementById("input");
+    const scoreEl = document.getElementById("score");
+    const timeEl = document.getElementById("time");
+    const levelEl = document.getElementById("level");
+    const messageEl = document.getElementById("message");
+    const restartBtn = document.getElementById("restartBtn");
+    const bgMusic = document.getElementById("bgMusic");
+    const musicToggle = document.getElementById("musicToggle");
+
+    let score = 0;
+    let time = 20;
+    let currentWord = "";
+    let level = "easy";
+    let timerInterval;
+    let musicOn = true;
+
+    function toggleMusic() {
+      musicOn = !musicOn;
+      if (musicOn) {
+        bgMusic.play();
+        musicToggle.textContent = "🔊 Music: On";
+      } else {
+        bgMusic.pause();
+        musicToggle.textContent = "🔇 Music: Off";
+      }
+    }
+
+    function getWordList() {
+      if (level === "easy") return easyWords;
+      if (level === "medium") return mediumWords;
+      return hardWords;
+    }
+
+    function getRandomWord() {
+      const list = getWordList();
+      return list[Math.floor(Math.random() * list.length)];
+    }
+
+    function showWord() {
+      currentWord = getRandomWord();
+      wordEl.textContent = currentWord;
+      inputEl.value = "";
+    }
+
+    function updateScore() {
+      score++;
+      scoreEl.textContent = `Score: ${score}`;
+
+      if (score === 20) {
+        level = "medium";
+        levelEl.textContent = "Level: Medium";
+      } else if (score === 40) {
+        level = "hard";
+        levelEl.textContent = "Level: Hard";
+      }
+    }
+
+    function updateTime() {
+      time--;
+      timeEl.textContent = `Time: ${time}s`;
+      if (time <= 0) {
+        clearInterval(timerInterval);
+        inputEl.disabled = true;
+        restartBtn.style.display = "inline-block";
+        if (level === "easy") {
+          messageEl.textContent = "⏰ Time's up ⏰ Your score: " + score + " (GOOD) ";
+        } else if (level === "medium") {
+          messageEl.textContent = "⏰ Time's up ⏰ Best! Your score: " + score + " (BEST) ";
+        } else {
+          messageEl.textContent = "⏰ Time's up ⏰ Excellent! Your score: " + score + " (EXCELLENT) ";
+        }
+      }
+    }
+
+ function startGame() {
+      score = 0;
+      time = 20;
+      level = "easy";
+      inputEl.disabled = false;
+      messageEl.textContent = "";
+      scoreEl.textContent = `Score: ${score}`;
+      timeEl.textContent = `Time: ${time}s`;
+      levelEl.textContent = "Level: Easy";
+      showWord();
+      clearInterval(timerInterval);
+      timerInterval = setInterval(updateTime, 1000);
+    }
+
+    function restartGame() {
+      clearInterval(timerInterval);
+      startGame();
+    }
+
+    inputEl.addEventListener("input", () => {
+      const typed = inputEl.value.trim().toLowerCase();
+      const target = currentWord.toLowerCase();
+
+      if (typed === target) {
+        clearInterval(timerInterval);
+        time = Math.min(time + 2, 60);
+        timeEl.textContent = `Time: ${time}s (+2)`;
+        timerInterval = setInterval(updateTime, 1000);
+        updateScore();
+        showWord();
+      } else if (!target.startsWith(typed) && typed.length > 0) {
+        time = Math.max(time - 2, 0);
+        timeEl.textContent = `Time: ${time}s (-2)`;
+        showWord();
+      }
+    });
+
+    window.onload = () => {
+      bgMusic.volume = 0.3;
+      startGame();
+    };
+    
+  </script><br>
+  <br><br><br><br>
+  <footer class="foot">
+    <p>Copyright&nbsp;©2024 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Raj Kumar Karki</p>
+  </footer>
+  </div>
+</body>
+</html>
